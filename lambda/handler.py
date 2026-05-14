@@ -49,11 +49,11 @@ def write_cursor(s3: Any, index: int) -> None:
 
 def handler(event: dict, context: Any) -> dict:
     """
-    Lambda entry point. Reads the next batch of IMDB reviews from S3, runs
-    sentiment inference, writes timestamped results back to S3, and advances
-    the cursor for the next run.
+    Lambda entry point. Handles two invocation modes:
+    - API Gateway: event has a body with a text field -- returns a single prediction
+    - EventBridge: event is empty -- runs the nightly batch job
 
-    :param event: event data passed by the invoker (e.g. EventBridge, test console)
+    :param event: event data passed by the invoker (e.g. API Gateway, EventBridge)
     :type event: dict
     :param context: Lambda runtime information (remaining time, memory, etc.)
     :type context: Any
@@ -61,7 +61,30 @@ def handler(event: dict, context: Any) -> dict:
     :rtype: dict
     """
     s3 = boto3.client("s3")
-
+    
+    # API Gateway path -- single real-time prediction
+    if event.get("body"):
+        body = json.loads(event["body"])
+        text = body.get("text", "")
+        
+        if not text:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"error": "No text provided"})
+            }
+        
+        result = classifer(text, truncation=True, max_length=512)
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({
+                "text": text,
+                "sentiment": result[0]["label"],
+                "confidence": round(result[0]["score"], 4)
+            })
+        }
+        
+    # EventBridge path -- batch processing
     obj = s3.get_object(Bucket=BUCKET, Key="raw/imdb_reviews.parquet")
     df_full = pd.read_parquet(BytesIO(obj["Body"].read()))
 
