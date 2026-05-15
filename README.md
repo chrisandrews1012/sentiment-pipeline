@@ -41,9 +41,8 @@ IMDB Dataset (HuggingFace)
 
 ## Installation and Setup
 
-### Codes and Resources Used
+### Resources Used
 
-- **Editor:** VS Code
 - **Python Version:** 3.12
 - **Package Manager:** [uv](https://github.com/astral-sh/uv)
 
