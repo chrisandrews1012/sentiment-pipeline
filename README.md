@@ -211,7 +211,6 @@ Full comparison: [notebooks/04_model_comparison.ipynb](notebooks/04_model_compar
 
 - [HuggingFace `distilbert-base-uncased-finetuned-sst-2-english`](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
 - [HuggingFace IMDB dataset](https://huggingface.co/datasets/imdb) — Andrew Maas et al., ACL 2011
-- [pragyy/datascience-readme-template](https://github.com/pragyy/datascience-readme-template) — README structure
 
 ---
 
