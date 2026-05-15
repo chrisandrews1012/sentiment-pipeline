@@ -5,13 +5,31 @@
 ![Python Version](https://img.shields.io/badge/python-3.12-blue)
 ![AWS](https://img.shields.io/badge/AWS-S3%20%7C%20Lambda%20%7C%20SageMaker%20%7C%20Bedrock-orange)
 
-An end-to-end NLP pipeline on AWS built to get hands-on experience with core services — not intended to be a novel contribution. It ingests IMDB movie reviews, runs sentiment analysis with DistilBERT, processes batches nightly, serves predictions via a live REST API, and uses Claude Sonnet 4.6 via Bedrock for richer structured output.
+Built to get hands-on familiarity with core AWS services: S3, Lambda, SageMaker, EventBridge, API Gateway, CloudWatch, Bedrock, ECR, and IAM.
 
-## Models
+## Problem Statement
 
-Two approaches are compared: **DistilBERT** (`distilbert-base-uncased-finetuned-sst-2-english`) for fast binary classification (~89% accuracy on 500 samples), and **Claude Sonnet 4.6 via Bedrock** for richer structured output with mixed sentiment support, key themes, and recommendation likelihood. See `notebooks/04_model_comparison.ipynb` for the side-by-side comparison.
+Sentiment analysis is a common NLP task in industry, used for product reviews, customer feedback, social media monitoring, and more. The challenge isn't just the model; it's operationalizing it: storing data reliably, automating batch jobs, serving predictions at low latency, and deciding when a simpler model is good enough versus when a more powerful one is worth the cost.
 
-## Setup
+## Approach
+
+Two models are compared:
+
+- **DistilBERT** (`distilbert-base-uncased-finetuned-sst-2-english`): a lightweight fine-tuned BERT model for fast binary sentiment classification, deployed as a containerized Lambda function
+- **Claude Sonnet 4.6 via Bedrock**: a frontier LLM used for richer structured output including mixed sentiment, key themes, a summary, and recommendation likelihood
+
+The pipeline ingests 500 IMDB movie reviews into S3, runs nightly batch inference via Lambda and EventBridge, serves real-time predictions through API Gateway, and uses SageMaker for notebook-based exploration and experiment tracking. Deployment is automated via GitHub Actions CI/CD.
+
+## Results
+
+| Model | Accuracy |
+|---|---|
+| DistilBERT | ~89% on 500 samples |
+| Claude Sonnet 4.6 | Qualitative only |
+
+DistilBERT handles high-volume binary classification cheaply and quickly. Claude produces richer output but at higher cost and latency, making it better suited for edge cases or deeper analysis. See `notebooks/04_model_comparison.ipynb` for the full side-by-side comparison.
+
+## How to Run
 
 ```bash
 git clone https://github.com/chrisandrews1012/sentiment-pipeline.git
@@ -27,9 +45,7 @@ make data     # Download IMDB reviews and upload to S3
 
 > **Note:** The SageMaker notebooks (`01_exploration.ipynb`, `02_deploy.ipynb`) must be run inside SageMaker Studio.
 
-## Live API
-
-**Endpoint:** `POST https://vpjyzs30p0.execute-api.us-east-1.amazonaws.com/prod/predict`
+**Live API**
 
 ```bash
 curl -X POST https://vpjyzs30p0.execute-api.us-east-1.amazonaws.com/prod/predict \
@@ -38,7 +54,7 @@ curl -X POST https://vpjyzs30p0.execute-api.us-east-1.amazonaws.com/prod/predict
   -d '{"text": "This movie was absolutely fantastic!"}'
 ```
 
-## Project Organization
+## File Structure
 
 ```
 sentiment-pipeline/
