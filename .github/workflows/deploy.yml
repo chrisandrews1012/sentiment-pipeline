@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'lambda/**'
+      - 'deploy/lambda/**'
 
 env:
   AWS_REGION: us-east-1
@@ -34,7 +34,7 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.REPO }}:latest
         run: |
-          docker build --provenance=false -t $IMAGE_URI lambda/
+          docker build --provenance=false -t $IMAGE_URI deploy/lambda/
           docker push $IMAGE_URI
         
       - name: Deploy to Lambda 

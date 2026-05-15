@@ -2,8 +2,9 @@
 .env
 *.csv
 *.parquet
-data/*
-!data/.gitkeep
+data/**/*.parquet
+data/**/*.csv
+!data/**/.gitkeep
 __pycache__/
 .ipynb_checkpoints/
 *.pyc

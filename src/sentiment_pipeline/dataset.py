@@ -12,13 +12,13 @@ print(f"Loaded {len(df)} reviews")
 print(df.head())
 
 # Save locally first to verify it looks right 
-df.to_parquet("data/imdb_reviews.parquet", index=False)
-print("Saved locally to data/imdb_reviews.parquet")
+df.to_parquet("data/raw/imdb_reviews.parquet", index=False)
+print("Saved locally to data/raw/imdb_reviews.parquet")
 
 # Upload to S3
-# Use upload_file for local files 
+# Use upload_file for local files
 s3 = boto3.client("s3")
-s3.upload_file("data/imdb_reviews.parquet", 
+s3.upload_file("data/raw/imdb_reviews.parquet",
                BUCKET, "raw/imdb_reviews.parquet")
 
 print(f"Uploaded to s3://{BUCKET}/raw/imdb_reviews.parquet")
